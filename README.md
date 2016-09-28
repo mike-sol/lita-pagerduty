@@ -24,6 +24,8 @@ Add the following variables to your Lita config file:
 ``` ruby
 config.handlers.pagerduty.api_key   = ''
 config.handlers.pagerduty.subdomain = ''
+config.handlers.pagerduty.service_api_key = '' # key for Pagerduty service for incident creation
+config.handlers.pagerduty.incident_creation_delay = 10 # delay between incident creation and query 
 ```
 
 ## Usage
@@ -35,6 +37,14 @@ pager incidents all                - Show all open incidents
 pager incidents mine               - Show all open incidents assigned to me
 pager incident <incident ID>       - Show a specific incident
 ```
+
+### Incident creation
+```
+pager incident create [Subject];[Body]
+                                  - Creates an incident for the configured service using the
+                                    provided subject and body. Semicolons or newlines work
+                                    for separating fields; body can be multi-line.
+``` 
 
 ### Incident notes
 

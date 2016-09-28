@@ -8,6 +8,8 @@ module Lita
     class PagerdutyUtility < Handler
       config :api_key, required: true
       config :subdomain, required: true
+      config :service_api_key, required: false
+      config :incident_creation_delay, type: Integer, default: 10, required: false
 
       namespace 'Pagerduty'
 

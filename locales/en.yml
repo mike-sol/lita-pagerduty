@@ -29,6 +29,9 @@ en:
           incidents_mine:
             syntax: pager incidents mine
             desc: Show all open incidents assigned to me
+          incident_create:
+            syntax: pager incident create [subject];[body]
+            desc: Creates a new incident. Use semicolon or newline for separation; body can be multiple lines.
           note:
             syntax: pager note 1234 some text
             desc: Add a note to a specific incident (not implemented yet)
@@ -71,6 +74,9 @@ en:
           unable_to_acknowledge: "%{id}: Unable to acknowledge incident"
           unable_to_resolve: "%{id}: Unable to resolve incident"
           info: "%{id}: \"%{subject}\", assigned to: %{assigned}, url: %{url}"
+          create_not_configured: No generic Pagerduty Service API key has been configured in the Lita config file, cannot create incidents.
+          unable_to_create_message: "Could not create the new incident: %{message}"
+          unable_to_create: "Could not create the new incident: unknown error."
         forget:
           complete: Your email has now been forgotten.
           unknown: No email on record for you.

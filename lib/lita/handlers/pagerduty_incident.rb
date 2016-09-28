@@ -37,6 +37,15 @@ module Lita
         }
       )
 
+      route(
+        /^pager\sincident\screate\s#{INCIDENT_CREATE_PATTERN}$/,
+        :incident_create,
+        command: true,
+        help: {
+          t('help.incident_create.syntax') => t('help.incident_create.desc')
+        }
+      )
+
       def incidents_all(response)
         incidents = fetch_all_incidents
         return response.reply(t('incident.none')) unless incidents.count > 0
@@ -61,6 +70,15 @@ module Lita
         return response.reply(t('incident.not_found', id: incident_id)) if incident == 'No results'
         response.reply(format_incident(incident))
       end
+
+      def incident_create(response)
+
+        create_incident({'subject' => response.match_data['subject'],
+                         'body'    => response.match_data['body']},
+                        response)
+
+      end
+
     end
 
     Lita.register_handler(PagerdutyIncident)

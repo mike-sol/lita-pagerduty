@@ -4,9 +4,9 @@ module PagerdutyHelper
   module Incident
     def format_incident(incident)
       t('incident.info', id: incident.id,
-                         subject: incident.trigger_summary_data.subject,
-                         url: incident.html_url,
-                         assigned: incident.assigned_to_user.nil? ? 'none' : incident.assigned_to_user.email)
+        subject: incident.trigger_summary_data.subject,
+        url: incident.html_url,
+        assigned: incident.assigned_to_user.nil? ? 'none' : incident.assigned_to_user.email)
     end
 
     def resolve_incident(incident_id)
@@ -25,7 +25,10 @@ module PagerdutyHelper
       client = pd_client
       list = []
       # FIXME: Workaround on current PD Gem
-      client.incidents.incidents.each do |incident|
+      incid = client.incidents
+
+      # puts incid.inspect
+      incid.incidents.each do |incident|
         list.push(incident) if incident.status != 'resolved'
       end
       list
@@ -60,5 +63,41 @@ module PagerdutyHelper
       end
     end
     # rubocop:enable Metrics/AbcSize
+
+    def create_incident(details, response)
+
+      unless service_api_key
+        return t('incident.create_not_configured')
+      end
+
+      client = pd_client
+      results = client.trigger({
+                                 'service_key' => service_api_key,
+                                 'description' => details['subject'],
+                                 'details' => {
+                                   'body' => details['body'],
+                                   'created_by' => response.user.name
+                                 }
+
+      })
+
+      if results['status'] == 'success'
+
+        response.reply("Incident submitted, waiting #{incident_creation_delay}s for it to be created in Pagerduty...")
+
+        # Success, but we don't know the incident number.
+        # Fetch it back after a few seconds of delay.
+        after(incident_creation_delay) do |timer|
+          incident = client.get_incident_by_key(results['incident_key'])
+          response.reply("Incident created: #{incident.incidents[0]['html_url']}")
+        end
+
+      else
+        t('incident.unable_to_create_message', message: results['message'])
+      end
+
+
+    end
+
   end
 end

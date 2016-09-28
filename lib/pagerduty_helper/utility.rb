@@ -39,5 +39,13 @@ module PagerdutyHelper
         }
       )
     end
+
+    def service_api_key
+      config.service_api_key 
+    end
+
+    def incident_creation_delay
+      config.incident_creation_delay
+    end
   end
 end

@@ -128,7 +128,8 @@ RSpec.shared_context 'basic fixtures' do
         html_url: 'https://acme.pagerduty.com/incidents/ABC123',
         trigger_summary_data: double(subject: 'something broke'),
         assigned_to_user: double(email: 'foo@example.com'),
-        acknowledge: { 'error' =>
+        acknowledge: {
+          'error' =>
           { 'message' => 'Incident Already Acknowledged', 'code' => 1002 }
         },
         resolve:  { 'id' => 'ABC123', 'status' => 'resolved' },

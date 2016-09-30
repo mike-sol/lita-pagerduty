@@ -72,13 +72,10 @@ module Lita
       end
 
       def incident_create(response)
-
-        create_incident({'subject' => response.match_data['subject'],
-                         'body'    => response.match_data['body']},
+        create_incident({ 'subject' => response.match_data['subject'],
+                          'body'    => response.match_data['body'] },
                         response)
-
       end
-
     end
 
     Lita.register_handler(PagerdutyIncident)

@@ -7,6 +7,7 @@ describe Lita::Handlers::PagerdutyIncident, lita_handler: true do
     is_expected.to route_command('pager incidents all').to(:incidents_all)
     is_expected.to route_command('pager incidents mine').to(:incidents_mine)
     is_expected.to route_command('pager incident ABC123').to(:incident)
+    is_expected.to route_command('pager incident create Subject;Body').to(:incident_create)
   end
 
   describe '#incidents_all' do

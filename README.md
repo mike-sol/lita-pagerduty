@@ -22,9 +22,13 @@ gem "lita-pagerduty"
 Add the following variables to your Lita config file:
 
 ``` ruby
-config.handlers.pagerduty.api_key   = ''
+config.handlers.pagerduty.api_key   = '' # Pagerduty API key 
 config.handlers.pagerduty.subdomain = ''
-config.handlers.pagerduty.service_api_key = '' # key for Pagerduty service for incident creation
+config.handlers.pagerduty.service_api_key = '' # key for a specific Pagerduty service, used for incident creation
+```
+
+Optionally, you may override these variables, which have defaults configured for you:
+```
 config.handlers.pagerduty.incident_creation_delay = 10 # delay between incident creation and query 
 ```
 

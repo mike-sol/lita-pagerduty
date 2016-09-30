@@ -4,3 +4,7 @@ FileName:
 
 LineLength:
   Max: 130
+
+ClassLength:
+  Max: 200
+  

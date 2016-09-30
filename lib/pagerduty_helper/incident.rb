@@ -3,7 +3,8 @@ module PagerdutyHelper
   # Incident-related functions
   module Incident
     def format_incident(incident)
-      t('incident.info', id: incident.id,
+      t('incident.info',
+        id: incident.id,
         subject: incident.trigger_summary_data.subject,
         url: incident.html_url,
         assigned: incident.assigned_to_user.nil? ? 'none' : incident.assigned_to_user.email)
@@ -65,39 +66,47 @@ module PagerdutyHelper
     # rubocop:enable Metrics/AbcSize
 
     def create_incident(details, response)
-
-      unless service_api_key
-        return t('incident.create_not_configured')
-      end
-
-      client = pd_client
-      results = client.trigger({
-                                 'service_key' => service_api_key,
-                                 'description' => details['subject'],
-                                 'details' => {
-                                   'body' => details['body'],
-                                   'created_by' => response.user.name
-                                 }
-
-      })
+      results = pd_client.trigger(new_incident_specs(details, response))
 
       if results['status'] == 'success'
-
-        response.reply("Incident submitted, waiting #{incident_creation_delay}s for it to be created in Pagerduty...")
-
-        # Success, but we don't know the incident number.
-        # Fetch it back after a few seconds of delay.
-        after(incident_creation_delay) do |timer|
-          incident = client.get_incident_by_key(results['incident_key'])
-          response.reply("Incident created: #{incident.incidents[0]['html_url']}")
-        end
-
+        incident_postsubmit(results, response)
       else
         t('incident.unable_to_create_message', message: results['message'])
       end
-
-
     end
 
+    def new_incident_specs(details, response)
+      {
+        'service_key' => service_api_key,
+        'description' => details['subject'],
+        'details' => { 'body' => details['body'], 'created_by' => response.user.name }
+      }
+    end
+
+    def incident_postsubmit(results, response)
+      response.reply(t('incident.submitted', delay: incident_creation_delay))
+
+      # Success, but we don't know the incident number; delay then fetch.
+      incident_creation_counter = 0
+      incident_creation_counter_max = 3
+      every(incident_creation_delay) do |timer|
+
+        incident_creation_counter = incident_creation_counter + 1
+
+        if incident_creation_counter > incident_creation_counter_max 
+          response.reply(t('incident.not_created'))
+          timer.stop
+        end
+
+        begin
+          incident = pd_client.get_incident_by_key(results['incident_key'])
+          response.reply(t('incident.created', url: incident.incidents[0]['html_url']))
+          timer.stop
+        rescue Exception => e  
+          # Must not have been created yet
+        end
+
+      end
+    end
   end
 end
